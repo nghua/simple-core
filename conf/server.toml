@@ -1,0 +1,15 @@
+[development]
+mode = "debug" # debug or release
+
+[server]
+port = ":8080"
+read_timeout = 60
+write_timeout = 60
+max_header_bytes = 20
+secure_key = "DHsj2Z^Fad9wkCjdQvDE4orGLKht&AzB"
+
+[database]
+db_user = "root"
+db_password = "158wanya"
+db_host = "127.0.0.1:3306"
+db_name = "simple"
