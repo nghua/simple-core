@@ -1,0 +1,14 @@
+input UserMetaInput {
+    nickname: String
+}
+
+type UserMeta {
+    nickname: String
+}
+
+type User {
+    id: Int64!
+    email: String!
+    role: Int!
+    meta: UserMeta
+}

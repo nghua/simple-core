@@ -1,0 +1,7 @@
+type Mutation {
+    # 用户注册接口
+    registerUser(email: String!, password: String!, userMeta: UserMetaInput): Boolean!
+
+    # 新建文章或页面
+#    addNewPost(author: String!, content: String!, title: String!, type: PostType = POST, meta: PostMetaInput): Boolean!
+}

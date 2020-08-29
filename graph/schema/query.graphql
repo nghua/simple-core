@@ -1,0 +1,8 @@
+type Query {
+    # 根据用户id查询用户信息
+    getUserInfo(id: Int64!): User
+    # 用户登录
+    login(email: String!, password: String!): String!
+
+    # 查询文章或页面信息
+}
