@@ -5,17 +5,18 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"simple-core/graph/generated"
 	"simple-core/graph/model"
+	"simple-core/service/users"
 )
 
 func (r *queryResolver) GetUserInfo(ctx context.Context, id int64) (*model.User, error) {
-	panic(fmt.Errorf("not implemented"))
+	cols := collectFields(ctx)
+	return users.GetUserInfo(id, cols...)
 }
 
 func (r *queryResolver) Login(ctx context.Context, email string, password string) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+	return users.UserLogin(email, password)
 }
 
 // Query returns generated.QueryResolver implementation.

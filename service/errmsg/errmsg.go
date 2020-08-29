@@ -10,4 +10,8 @@ var (
 	UserEmailOrPasswordWrongError = errors.New("用户邮箱或密码错误")
 
 	PostNotFoundError = errors.New("文章不存在")
+
+	TokenWrongError      = errors.New("token不正确")
+	TokenParseWrongError = errors.New("token 解析错误")
+	TokenNotFoundError   = errors.New("token没有找到")
 )

@@ -9,7 +9,7 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.2.0
-	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/json-iterator/go v1.1.9
 	github.com/pelletier/go-toml v1.8.0
 	github.com/sirupsen/logrus v1.6.0

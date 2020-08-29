@@ -71,14 +71,14 @@ func TestInsertUser(t *testing.T) {
 }
 
 func TestAlterUserInfo(t *testing.T) {
-	_, err := AlterUserInfo(2, "", "", 4, nil)
+	_, err := AlterUserInfo(3, "", "23456789", 4, nil)
 	if err != nil {
 		t.Errorf("更改用户信息出错：%v", err)
 	}
 }
 
 func TestDeleteUser(t *testing.T) {
-	_, err := DeleteUser(2)
+	_, err := DeleteUser(3)
 	if err != nil {
 		t.Errorf("删除用户出错：%v", err)
 	}

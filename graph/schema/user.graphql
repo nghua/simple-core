@@ -12,3 +12,5 @@ type User {
     role: Int!
     meta: UserMeta
 }
+
+directive @hasRole(role: Int!) on FIELD_DEFINITION 

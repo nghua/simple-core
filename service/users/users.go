@@ -116,7 +116,7 @@ func UserLogin(email, password string) (string, error) {
 	}
 
 	u := &database.Users{Email: email}
-	has, err := database.Engine().Cols("id", "password").Get(u)
+	has, err := database.Engine().Cols("id", "password", "role").Get(u)
 	if err != nil {
 		return "", errmsg.InternalError
 	}
@@ -130,7 +130,7 @@ func UserLogin(email, password string) (string, error) {
 		return "", errmsg.UserEmailOrPasswordWrongError
 	}
 
-	userToke, err := token.Sign(u.Id, email)
+	userToke, err := token.Sign(u.Id, email, u.Role)
 	if err != nil {
 		return "", errmsg.InternalError
 	}
@@ -145,7 +145,7 @@ func UpdateUserEmail(id int64, email string) (bool, error) {
 		return false, err
 	}
 	u := &database.Users{Email: email}
-	has, err := database.Engine().Cols("version").Get(u)
+	has, err := database.Engine().Exist(u)
 	if err != nil {
 		return false, errmsg.InternalError
 	}
@@ -153,6 +153,18 @@ func UpdateUserEmail(id int64, email string) (bool, error) {
 	if has {
 		return false, errmsg.UserEmailExistError
 	}
+
+	u = &database.Users{Id: id}
+	has, err = database.Engine().Cols("version").Get(u)
+	if err != nil {
+		return false, errmsg.InternalError
+	}
+
+	if !has {
+		return false, errmsg.UserNotFoundError
+	}
+
+	u = &database.Users{Email: email, Version: u.Version}
 
 	_, err = database.Engine().ID(id).Update(u)
 	if err != nil {
@@ -169,7 +181,7 @@ func UpdateUserPassword(id int64, password string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	u := &database.Users{}
+	u := &database.Users{Id: id}
 	has, err := database.Engine().Cols("version").Get(u)
 	if err != nil {
 		return false, errmsg.InternalError
@@ -179,6 +191,12 @@ func UpdateUserPassword(id int64, password string) (bool, error) {
 		return false, errmsg.UserNotFoundError
 	}
 
+	p, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return false, errmsg.InternalError
+	}
+
+	u = &database.Users{Password: string(p), Version: u.Version}
 	_, err = database.Engine().ID(id).Update(u)
 	if err != nil {
 		return false, errmsg.InternalError
@@ -189,7 +207,7 @@ func UpdateUserPassword(id int64, password string) (bool, error) {
 
 // UpdateUserMeta 函数为用户跟新字段的具体实现
 func UpdateUserMeta(id int64, meta *model.UserMeta) (bool, error) {
-	u := &database.Users{}
+	u := &database.Users{Id: id}
 	has, err := database.Engine().Cols("version").Get(u)
 	if err != nil {
 		return false, errmsg.InternalError
@@ -203,7 +221,11 @@ func UpdateUserMeta(id int64, meta *model.UserMeta) (bool, error) {
 		return false, errmsg.InternalError
 	}
 
-	u.Meta = um
+	u = &database.Users{
+		Meta:    um,
+		Version: u.Version,
+	}
+
 	_, err = database.Engine().ID(id).Update(u)
 	if err != nil {
 		return false, errmsg.InternalError
@@ -224,6 +246,11 @@ func InsertUser(email, password string, role int, meta *model.UserMeta) (bool, e
 		return false, err
 	}
 
+	p, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return false, errmsg.InternalError
+	}
+
 	um, err := json.MarshalToString(meta)
 	if err != nil {
 		return false, errmsg.InternalError
@@ -231,7 +258,7 @@ func InsertUser(email, password string, role int, meta *model.UserMeta) (bool, e
 
 	u := &database.Users{
 		Email:    email,
-		Password: password,
+		Password: string(p),
 		Role:     role,
 		Meta:     um,
 	}
@@ -247,7 +274,7 @@ func InsertUser(email, password string, role int, meta *model.UserMeta) (bool, e
 // AlterUserInfo 为后台更改用户信息的具体实现
 func AlterUserInfo(id int64, email, password string, role int, meta *model.UserMeta) (bool, error) {
 	u := &database.Users{}
-	has, err := database.Engine().Cols("version").Get(u)
+	has, err := database.Engine().ID(id).Cols("version").Get(u)
 	if err != nil {
 		return false, errmsg.InternalError
 	}
@@ -271,7 +298,11 @@ func AlterUserInfo(id int64, email, password string, role int, meta *model.UserM
 		if err != nil {
 			return false, err
 		}
-		u.Password = password
+		p, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			return false, errmsg.InternalError
+		}
+		u.Password = string(p)
 	}
 
 	if role != 0 {

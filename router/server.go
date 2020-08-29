@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"net/http"
+	"simple-core/middleware"
 	"simple-core/setting"
 	"time"
 
@@ -16,7 +17,7 @@ var server *http.Server
 func Run() {
 	gin.SetMode(setting.Mode)
 
-	router := initRouter(gin.Recovery(), gin.Logger())
+	router := initRouter(gin.Recovery(), gin.Logger(), middleware.GetGinContext())
 
 	server = &http.Server{
 		Addr:           setting.Port,
