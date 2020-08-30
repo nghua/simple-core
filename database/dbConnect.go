@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"simple-core/setting"
+	"simple-core/public/setting"
 
 	log "github.com/sirupsen/logrus"
 
@@ -21,7 +21,15 @@ func init() {
 		log.Fatalf("数据库连接出错：%v", err)
 	}
 
-	err = engine.Sync2(new(Users))
+	err = engine.Sync2(new(Users), new(Terms), new(TermRelationships))
+	if err != nil {
+		log.Fatalf("同步数据库出错：%v", err)
+	}
+
+	_, err = engine.Exec(`CREATE TABLE IF NOT EXISTS uuid (
+    h int(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    x tinyint(4) NOT NULL UNIQUE DEFAULT '0'
+)`)
 	if err != nil {
 		log.Fatalf("同步数据库出错：%v", err)
 	}

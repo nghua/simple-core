@@ -1,8 +1,13 @@
 type Query {
     # 根据用户id查询用户信息
-    getUserInfo(id: Int64!): User
+    getUser(id: Int64!): User
+    getUserList(offset: Int = 0, row: Int = 10): [User] @hasRole(role: 4)
     # 用户登录
     login(email: String!, password: String!): String!
+
+    # 分类及标签
+    getTerm(id: Int64!, termType: Int = 0): Term!
+    getTermList(termType: Int = 0, offset: Int = 0, row: Int = 10, non:Boolean = false): [Term!]
 
     # 查询文章或页面信息
 }

@@ -1,0 +1,33 @@
+#enum PostCommentStatus {
+#    OPEN
+#    CLOSE
+#}
+#
+#enum PostType {
+#    POST
+#    PAGE
+#}
+#
+#type PostMeta {
+#    image: String
+#    commentStatus: PostCommentStatus
+#    commentCount: Int!
+#}
+#
+#input PostMetaInput {
+#    image: String
+#    commentStatus: PostCommentStatus
+#    commentCount: Int!
+#}
+#
+#type Post {
+#    id: Int64!
+#    author: User!
+#    created: Time!
+#    content: String!
+#    title: String!
+#    excerpt: String!
+#    modified: Time!
+#    type: PostType!
+#    meta: PostMeta
+#}

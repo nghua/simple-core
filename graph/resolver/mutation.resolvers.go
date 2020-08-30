@@ -7,23 +7,36 @@ import (
 	"context"
 	"simple-core/graph/generated"
 	"simple-core/graph/model"
+	"simple-core/service/terms"
 	"simple-core/service/users"
 )
 
 func (r *mutationResolver) RegisterUser(ctx context.Context, email string, password string, userMeta *model.UserMeta) (bool, error) {
-	return users.RegisterUser(email, password, userMeta)
+	return users.Register(email, password, userMeta)
 }
 
 func (r *mutationResolver) InsertUser(ctx context.Context, email string, password string, role *int, userMeta *model.UserMeta) (bool, error) {
-	return users.InsertUser(email, password, *role, userMeta)
+	return users.Insert(email, password, *role, userMeta)
 }
 
-func (r *mutationResolver) AlterUserInfo(ctx context.Context, id int64, email *string, password *string, role *int, userMeta *model.UserMeta) (bool, error) {
-	return users.AlterUserInfo(id, *email, *password, *role, userMeta)
+func (r *mutationResolver) AlterUser(ctx context.Context, id int64, email *string, password *string, role *int, userMeta *model.UserMeta) (bool, error) {
+	return users.Alter(id, *email, *password, *role, userMeta)
 }
 
 func (r *mutationResolver) DeleteUser(ctx context.Context, id int64) (bool, error) {
-	return users.DeleteUser(id)
+	return users.Delete(id)
+}
+
+func (r *mutationResolver) AddTerm(ctx context.Context, termType int, name string, meta *model.TermMeta) (bool, error) {
+	return terms.Add(termType, name, meta)
+}
+
+func (r *mutationResolver) AlterTerm(ctx context.Context, id int64, name *string, meta *model.TermMeta) (bool, error) {
+	return terms.Alter(id, *name, meta)
+}
+
+func (r *mutationResolver) DeleteTerm(ctx context.Context, id int64) (bool, error) {
+	return terms.Delete(id)
 }
 
 // Mutation returns generated.MutationResolver implementation.

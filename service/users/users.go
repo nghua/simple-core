@@ -5,6 +5,7 @@ import (
 	"simple-core/graph/model"
 	"simple-core/service/errmsg"
 	"simple-core/service/token"
+	"simple-core/service/uuid"
 	"simple-core/service/validate"
 
 	json "github.com/json-iterator/go"
@@ -24,8 +25,8 @@ type userInfo struct {
 	userPassword
 }
 
-// GetUserInfo 函数通过传入用户的id，获取cols字段中的所需要的数据。
-func GetUserInfo(id int64, cols ...string) (*model.User, error) {
+// Get 函数通过传入用户的id，获取cols字段中的所需要的数据。
+func Get(id int64, cols ...string) (*model.User, error) {
 	u := &database.Users{Id: id}
 	has, err := database.Engine().Cols(cols...).Get(u)
 	if err != nil {
@@ -54,8 +55,8 @@ func GetUserInfo(id int64, cols ...string) (*model.User, error) {
 	return user, nil
 }
 
-// RegisterUser 函数为用户注册的具体逻辑实现
-func RegisterUser(email, password string, meta *model.UserMeta) (bool, error) {
+// Register 函数为用户注册的具体逻辑实现
+func Register(email, password string, meta *model.UserMeta) (bool, error) {
 	ui := &userInfo{
 		userEmail:    userEmail{Email: email},
 		userPassword: userPassword{Password: password},
@@ -81,7 +82,13 @@ func RegisterUser(email, password string, meta *model.UserMeta) (bool, error) {
 		return false, errmsg.InternalError
 	}
 
+	uid, err := uuid.GenerateUid()
+	if err != nil {
+		return false, errmsg.InternalError
+	}
+
 	u = &database.Users{
+		Id:       uid,
 		Email:    email,
 		Password: string(pwBytes),
 	}
@@ -103,8 +110,8 @@ func RegisterUser(email, password string, meta *model.UserMeta) (bool, error) {
 	return true, nil
 }
 
-// UserLogin 函数为用户登录的具体实现
-func UserLogin(email, password string) (string, error) {
+// Login 函数为用户登录的具体实现
+func Login(email, password string) (string, error) {
 	ui := &userInfo{
 		userEmail:    userEmail{Email: email},
 		userPassword: userPassword{Password: password},
@@ -137,8 +144,8 @@ func UserLogin(email, password string) (string, error) {
 	return userToke, nil
 }
 
-// UpdateUserEmail 函数为用户更新邮箱的具体实现
-func UpdateUserEmail(id int64, email string) (bool, error) {
+// UpdateEmail 函数为用户更新邮箱的具体实现
+func UpdateEmail(id int64, email string) (bool, error) {
 	ue := &userEmail{Email: email}
 	err := validate.Struct(ue)
 	if err != nil {
@@ -174,8 +181,8 @@ func UpdateUserEmail(id int64, email string) (bool, error) {
 	return true, nil
 }
 
-// UpdateUserPassword 函数为用户更新密码的具体实现
-func UpdateUserPassword(id int64, password string) (bool, error) {
+// UpdatePassword 函数为用户更新密码的具体实现
+func UpdatePassword(id int64, password string) (bool, error) {
 	up := &userPassword{Password: password}
 	err := validate.Struct(up)
 	if err != nil {
@@ -205,8 +212,8 @@ func UpdateUserPassword(id int64, password string) (bool, error) {
 	return true, nil
 }
 
-// UpdateUserMeta 函数为用户跟新字段的具体实现
-func UpdateUserMeta(id int64, meta *model.UserMeta) (bool, error) {
+// UpdateMeta 函数为用户跟新字段的具体实现
+func UpdateMeta(id int64, meta *model.UserMeta) (bool, error) {
 	u := &database.Users{Id: id}
 	has, err := database.Engine().Cols("version").Get(u)
 	if err != nil {
@@ -234,8 +241,8 @@ func UpdateUserMeta(id int64, meta *model.UserMeta) (bool, error) {
 	return true, nil
 }
 
-// InsertUser 为后台插入用户的具体实现
-func InsertUser(email, password string, role int, meta *model.UserMeta) (bool, error) {
+// Insert 为后台插入用户的具体实现
+func Insert(email, password string, role int, meta *model.UserMeta) (bool, error) {
 	ui := &userInfo{
 		userEmail:    userEmail{Email: email},
 		userPassword: userPassword{Password: password},
@@ -251,12 +258,21 @@ func InsertUser(email, password string, role int, meta *model.UserMeta) (bool, e
 		return false, errmsg.InternalError
 	}
 
-	um, err := json.MarshalToString(meta)
+	um := ""
+	if meta != nil {
+		um, err = json.MarshalToString(meta)
+		if err != nil {
+			return false, errmsg.InternalError
+		}
+	}
+
+	uid, err := uuid.GenerateUid()
 	if err != nil {
 		return false, errmsg.InternalError
 	}
 
 	u := &database.Users{
+		Id:       uid,
 		Email:    email,
 		Password: string(p),
 		Role:     role,
@@ -271,8 +287,8 @@ func InsertUser(email, password string, role int, meta *model.UserMeta) (bool, e
 	return true, nil
 }
 
-// AlterUserInfo 为后台更改用户信息的具体实现
-func AlterUserInfo(id int64, email, password string, role int, meta *model.UserMeta) (bool, error) {
+// Alter 为后台更改用户信息的具体实现
+func Alter(id int64, email, password string, role int, meta *model.UserMeta) (bool, error) {
 	u := &database.Users{}
 	has, err := database.Engine().ID(id).Cols("version").Get(u)
 	if err != nil {
@@ -325,13 +341,41 @@ func AlterUserInfo(id int64, email, password string, role int, meta *model.UserM
 	return true, nil
 }
 
-// DeleteUser 为后台删除用户的具体实现
-func DeleteUser(id int64) (bool, error) {
-	u := &database.Users{}
-	_, err := database.Engine().ID(id).Delete(u)
+// Delete 为后台删除用户的具体实现
+func Delete(id int64) (bool, error) {
+	_, err := database.Engine().ID(id).Delete(new(database.Users))
 	if err != nil {
 		return false, errmsg.InternalError
 	}
 
 	return true, nil
+}
+
+func GetList(offset, row int, cols ...string) ([]*model.User, error) {
+	var usersList []database.Users
+	err := database.Engine().Cols(cols...).Limit(row, offset).Find(&usersList)
+	if err != nil {
+		return nil, errmsg.InternalError
+	}
+
+	users := make([]*model.User, len(usersList))
+	meta := &model.UserMeta{}
+
+	for i, u := range usersList {
+		if u.Meta != "" {
+			err = json.UnmarshalFromString(u.Meta, meta)
+			if err != nil {
+				return nil, errmsg.InternalError
+			}
+		}
+
+		users[i] = &model.User{
+			ID:    u.Id,
+			Email: u.Email,
+			Role:  u.Role,
+			Meta:  meta,
+		}
+	}
+
+	return users, nil
 }

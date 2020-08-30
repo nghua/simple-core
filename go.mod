@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/99designs/gqlgen v0.12.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/edwingeng/wuid v0.0.0-20200821120907-84c634e7cb62
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0

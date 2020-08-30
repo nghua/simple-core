@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 	"simple-core/middleware"
-	"simple-core/setting"
+	"simple-core/public/setting"
 	"time"
 
 	log "github.com/sirupsen/logrus"

@@ -2,7 +2,7 @@ package router
 
 import (
 	"simple-core/handler"
-	"simple-core/setting"
+	"simple-core/public/setting"
 
 	"github.com/gin-gonic/gin"
 )

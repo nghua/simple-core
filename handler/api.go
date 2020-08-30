@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"simple-core/graph/generated"
 	"simple-core/graph/resolver"
+	"simple-core/service/errmsg"
 	"simple-core/service/token"
 	"simple-core/utils/tool"
 
@@ -25,12 +25,14 @@ func GraphqlHandler() gin.HandlerFunc {
 		}
 
 		ut := token.ParseToken(gc)
-		currentUserRole := ut.UserRole
-		if currentUserRole >= role {
-			return next(ctx)
+		if ut != nil {
+			currentUserRole := ut.UserRole
+			if currentUserRole >= role {
+				return next(ctx)
+			}
 		}
 
-		return nil, errors.New("权限验证失败")
+		return nil, errmsg.TokenNotFoundError
 	}
 
 	h := handler.NewDefaultServer(generated.NewExecutableSchema(conf))

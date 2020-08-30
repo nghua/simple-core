@@ -1,0 +1,14 @@
+type Term {
+    id: Int64!
+    name: String!
+    meta: TermMeta
+    count: Int64!
+}
+
+type TermMeta {
+    description: String
+}
+
+input TermMetaInput {
+    description: String
+}

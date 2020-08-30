@@ -3,8 +3,14 @@ type Mutation {
     registerUser(email: String!, password: String!, userMeta: UserMetaInput): Boolean!
 
     insertUser(email: String!, password: String!, role: Int = 0, userMeta: UserMetaInput): Boolean! @hasRole(role: 4)
-    alterUserInfo(id: Int64!, email: String, password: String, role: Int = 0, userMeta: UserMetaInput):Boolean! @hasRole(role: 4)
+    alterUser(id: Int64!, email: String, password: String, role: Int = 0, userMeta: UserMetaInput):Boolean! @hasRole(role: 4)
     deleteUser(id: Int64!): Boolean!  @hasRole(role: 4)
+
+    # 分类目录或标签
+    addTerm(termType: Int!, name: String!,  meta: TermMetaInput): Boolean! @hasRole(role: 4)
+    alterTerm(id: Int64!, name: String, meta: TermMetaInput): Boolean! @hasRole(role: 4)
+    DeleteTerm(id: Int64!): Boolean! @hasRole(role: 4)
+
     # 新建文章或页面
 #    addNewPost(author: String!, content: String!, title: String!, type: PostType = POST, meta: PostMetaInput): Boolean!
 }

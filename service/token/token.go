@@ -1,8 +1,8 @@
 package token
 
 import (
+	"simple-core/public/setting"
 	"simple-core/service/errmsg"
-	"simple-core/setting"
 	"strings"
 	"time"
 

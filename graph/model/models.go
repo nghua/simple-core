@@ -2,6 +2,17 @@
 
 package model
 
+type Term struct {
+	ID    int64     `json:"id"`
+	Name  string    `json:"name"`
+	Meta  *TermMeta `json:"meta"`
+	Count int64     `json:"count"`
+}
+
+type TermMeta struct {
+	Description *string `json:"description"`
+}
+
 type User struct {
 	ID    int64     `json:"id"`
 	Email string    `json:"email"`
